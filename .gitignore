@@ -1,4 +1,10 @@
 /target
-/npm/*/bin/
 node_modules/
 .blueprint/
+
+# Platform binary directories (populated by CI, not committed)
+/npm/win32-x64/bin/
+/npm/darwin-arm64/bin/
+/npm/darwin-x64/bin/
+/npm/linux-x64/bin/
+/npm/linux-arm64/bin/

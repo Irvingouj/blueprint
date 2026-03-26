@@ -1,0 +1,14 @@
+{
+  "name": "@irvingouj/blueprint-cli-darwin-x64",
+  "version": "0.1.0",
+  "description": "blueprint CLI binary for macOS x64 (Intel)",
+  "license": "MIT",
+  "os": ["darwin"],
+  "cpu": ["x64"],
+  "files": ["bin/blueprint"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Irvingouj/blueprint.git",
+    "directory": "npm/darwin-x64"
+  }
+}

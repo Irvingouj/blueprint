@@ -1,0 +1,26 @@
+{
+  "name": "@irvingouj/blueprint-cli",
+  "version": "0.1.0",
+  "description": "Cross-agent context injection tool — save plans with file references, load them with all references resolved inline",
+  "license": "MIT",
+  "bin": {
+    "blueprint": "bin/blueprint"
+  },
+  "files": [
+    "bin/blueprint"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Irvingouj/blueprint.git"
+  },
+  "optionalDependencies": {
+    "@irvingouj/blueprint-cli-win32-x64": "0.1.0",
+    "@irvingouj/blueprint-cli-darwin-arm64": "0.1.0",
+    "@irvingouj/blueprint-cli-darwin-x64": "0.1.0",
+    "@irvingouj/blueprint-cli-linux-x64": "0.1.0",
+    "@irvingouj/blueprint-cli-linux-arm64": "0.1.0"
+  }
+}

@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+
+"use strict";
+
+const { execFileSync } = require("child_process");
+
+const PLATFORMS = {
+  "win32-x64":    "@irvingouj/blueprint-cli-win32-x64",
+  "darwin-arm64": "@irvingouj/blueprint-cli-darwin-arm64",
+  "darwin-x64":   "@irvingouj/blueprint-cli-darwin-x64",
+  "linux-x64":    "@irvingouj/blueprint-cli-linux-x64",
+  "linux-arm64":  "@irvingouj/blueprint-cli-linux-arm64",
+};
+
+function getBinaryPath() {
+  const platformKey = `${process.platform}-${process.arch}`;
+  const pkg = PLATFORMS[platformKey];
+
+  if (!pkg) {
+    throw new Error(
+      `Unsupported platform: ${platformKey}. ` +
+      `blueprint currently supports: ${Object.keys(PLATFORMS).join(", ")}`
+    );
+  }
+
+  const binaryName = process.platform === "win32" ? "blueprint.exe" : "blueprint";
+
+  try {
+    return require.resolve(`${pkg}/bin/${binaryName}`);
+  } catch {
+    throw new Error(
+      `Could not find the blueprint binary for ${platformKey}. ` +
+      `The package ${pkg} may not be installed. ` +
+      `Make sure optional dependencies are enabled (do not use --no-optional).`
+    );
+  }
+}
+
+function main() {
+  const binaryPath = getBinaryPath();
+
+  try {
+    execFileSync(binaryPath, process.argv.slice(2), {
+      stdio: "inherit",
+    });
+  } catch (e) {
+    if (e.status !== undefined) {
+      process.exit(e.status);
+    }
+    throw e;
+  }
+}
+
+main();
