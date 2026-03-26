@@ -19,16 +19,9 @@ pub enum Reference {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum TypedReference {
-    File {
-        path: String,
-    },
-    Url {
-        url: String,
-    },
-    GitDiff {
-        path: String,
-        range: String,
-    },
+    File { path: String },
+    Url { url: String },
+    GitDiff { path: String, range: String },
 }
 
 /// The YAML frontmatter of a blueprint document.

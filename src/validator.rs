@@ -63,8 +63,8 @@ fn validate_url_format(url_str: &str) -> Result<()> {
     if url_str.is_empty() {
         return Err(BlueprintError::Validation("URL cannot be empty".into()));
     }
-    let parsed =
-        Url::parse(url_str).map_err(|e| BlueprintError::Validation(format!("invalid URL '{url_str}': {e}")))?;
+    let parsed = Url::parse(url_str)
+        .map_err(|e| BlueprintError::Validation(format!("invalid URL '{url_str}': {e}")))?;
     let scheme = parsed.scheme();
     if scheme != "http" && scheme != "https" {
         return Err(BlueprintError::Validation(format!(
@@ -82,7 +82,10 @@ fn validate_git_range_format(range: &str) -> Result<()> {
     }
     // Basic check: range should contain ".." for a proper range
     // or be a valid-looking ref (alphanumeric, ~, ^, etc.)
-    if !range.contains("..") && !range.chars().all(|c| c.is_alphanumeric() || "~^-_/".contains(c))
+    if !range.contains("..")
+        && !range
+            .chars()
+            .all(|c| c.is_alphanumeric() || "~^-_/".contains(c))
     {
         return Err(BlueprintError::Validation(format!(
             "git range looks invalid: '{range}' (expected format like 'HEAD~3..HEAD')"

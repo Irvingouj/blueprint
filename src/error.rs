@@ -21,7 +21,10 @@ pub enum BlueprintError {
     ResolutionFailed { reference: String, reason: String },
 
     #[error("Resolution timed out for {reference} after {timeout_secs}s")]
-    Timeout { reference: String, timeout_secs: u64 },
+    Timeout {
+        reference: String,
+        timeout_secs: u64,
+    },
 
     #[error("{0}")]
     Other(String),

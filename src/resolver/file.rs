@@ -29,12 +29,12 @@ impl Resolver for FileResolver {
 
         info!(path = %file_path.display(), "resolving file reference");
 
-        let content = tokio::fs::read_to_string(&file_path)
-            .await
-            .map_err(|e| BlueprintError::ResolutionFailed {
+        let content = tokio::fs::read_to_string(&file_path).await.map_err(|e| {
+            BlueprintError::ResolutionFailed {
                 reference: self.path.clone(),
                 reason: format!("failed to read '{}': {e}", file_path.display()),
-            })?;
+            }
+        })?;
 
         Ok(ResolvedContent {
             label: self.path.clone(),

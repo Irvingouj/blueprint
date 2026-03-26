@@ -15,9 +15,9 @@ pub async fn run(
     let raw = match (file, content) {
         (Some(path), _) => {
             info!(path = %path, "reading blueprint from file");
-            tokio::fs::read_to_string(path).await.map_err(|e| {
-                BlueprintError::Other(format!("failed to read file '{path}': {e}"))
-            })?
+            tokio::fs::read_to_string(path)
+                .await
+                .map_err(|e| BlueprintError::Other(format!("failed to read file '{path}': {e}")))?
         }
         (_, Some(text)) => text.to_string(),
         (None, None) => {
