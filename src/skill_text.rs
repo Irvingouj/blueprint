@@ -1,4 +1,4 @@
-pub const SKILL_TEXT: &str = r#"## Blueprint — Cross-Agent Context Injection Tool
+pub const SKILL_TEXT: &str = r##"## Blueprint — Cross-Agent Context Injection Tool
 
 Blueprint is a CLI tool for saving markdown documents with file/URL/git references, then loading them with all referenced content resolved and inlined. This lets you capture implementation plans with their full context.
 
@@ -64,8 +64,10 @@ Save markdown content as a named blueprint.
 # From file
 blueprint save --handle refactor-auth --file ./plans/auth.md
 
-# From inline content
-blueprint save --handle quick-fix "# Fix plan\n\n1. Update config"
+# From inline content (use literal newlines, not escaped)
+blueprint save --handle quick-fix "# Fix plan
+
+1. Update config"
 
 # Save globally (accessible from any project)
 blueprint save --handle global-template --file template.md --global
@@ -211,4 +213,4 @@ blueprint load <name> [--global]
 # List available
 blueprint list [--global]
 ```
-"#;
+"##;
