@@ -1,4 +1,9 @@
-pub const SKILL_TEXT: &str = r##"## Blueprint — Cross-Agent Context Injection Tool
+pub const SKILL_TEXT: &str = r##"---
+name: blueprint
+description: Use this skill whenever the user wants to save, load, list, or manage blueprints — markdown documents with embedded file/URL/git-diff references that get resolved inline on load. Enables cross-session communication by capturing implementation plans with their full source context so another agent (or yourself in a future session) can pick up exactly where you left off. Trigger when the user mentions 'blueprint', 'save a plan', 'load content into context', or asks to capture implementation plans with full source context.
+---
+
+## Blueprint — Cross-Agent Context Injection Tool
 
 Blueprint is a CLI tool for saving markdown documents with file/URL/git references, then loading them with all referenced content resolved and inlined. This lets you capture implementation plans with their full context.
 
@@ -20,6 +25,7 @@ A blueprint file has two parts: YAML frontmatter between `---` delimiters, follo
 
 ```yaml
 ---
+description: Fix login session handling with proper expiry checks
 references:
   - src/main.rs                    # Bare string = file path
   - lib/utils.ts                   # Relative paths resolved from base_dir
@@ -64,6 +70,9 @@ Save markdown content as a named blueprint.
 # From file
 blueprint save --handle refactor-auth --file ./plans/auth.md
 
+# With explicit description
+blueprint save --handle refactor-auth --file ./plans/auth.md --description "Refactor auth to use JWT"
+
 # From inline content (use literal newlines, not escaped)
 blueprint save --handle quick-fix "# Fix plan
 
@@ -75,6 +84,7 @@ blueprint save --handle global-template --file template.md --global
 
 **Behavior:**
 - Injects `base_dir` (current working directory) and `saved_at` (timestamp) into frontmatter
+- Sets `description` from: `--description` flag → existing frontmatter → first H1 heading in body
 - Validates frontmatter structure and reference formats
 - Warns if references list is empty
 - Overwrites existing blueprint with same handle
@@ -128,11 +138,26 @@ Implementation plan goes here...
 #### `blueprint list` — List available blueprints
 
 ```bash
-blueprint list              # List project-level blueprints
-blueprint list --global     # List global blueprints
+blueprint list                    # List project-level blueprints
+blueprint list --global           # List global blueprints
+blueprint list --sort-time        # Sort by creation time (newest first)
+blueprint list --filter auth      # Fuzzy-match on handle or description
+blueprint list -t -f auth         # Combined: sorted and filtered
 ```
 
-Output: One handle per line, or "No blueprints found" message.
+Output:
+```
+  HANDLE          WHEN   DESCRIPTION
+  ──────────────────────────────────────────────
+  fix-login       5m     Fix login session handling with proper expiry checks
+  refactor-auth   2h     Refactor auth module to use new JWT library
+  plan1           3d     (no description)
+```
+
+**Flags:**
+- `--sort-time` / `-t`: Sort by creation time, newest first (blueprints without timestamps go last)
+- `--filter <pattern>` / `-f <pattern>`: Fuzzy-match against handle and description
+- `--global`: List global blueprints instead of project-level
 
 #### `blueprint skill` — Output this help text
 
@@ -190,11 +215,12 @@ blueprint load fix-login | llm --system "You are a code reviewer"
 ### Best Practices
 
 1. **Use descriptive handles**: `refactor-auth-2024-01` vs `plan1`
-2. **Prefer relative paths** in references — they're portable across machines
-3. **Keep base_dir intact** — it's set automatically and enables portability
-4. **Use git-diff for active work** — captures work-in-progress on a branch
-5. **Validate with list**: Run `blueprint list` before `load` to confirm existence
-6. **Check warnings on save**: Empty references list produces a warning but still saves
+2. **Add descriptions**: Either via `--description` or a clear H1 heading
+3. **Prefer relative paths** in references — they're portable across machines
+4. **Keep base_dir intact** — it's set automatically and enables portability
+5. **Use git-diff for active work** — captures work-in-progress on a branch
+6. **Validate with list**: Run `blueprint list` before `load` to confirm existence
+7. **Check warnings on save**: Empty references list produces a warning but still saves
 
 ---
 
@@ -202,7 +228,7 @@ blueprint load fix-login | llm --system "You are a code reviewer"
 
 ```bash
 # Save current plan
-blueprint save --handle <name> --file <path> [--global]
+blueprint save --handle <name> --file <path> [--global] [--description "text"]
 
 # Save inline
 blueprint save --handle <name> "# Markdown content"
@@ -210,7 +236,7 @@ blueprint save --handle <name> "# Markdown content"
 # Load with all references resolved
 blueprint load <name> [--global]
 
-# List available
-blueprint list [--global]
+# List available (with optional sorting and filtering)
+blueprint list [--global] [--sort-time] [--filter <pattern>]
 ```
 "##;

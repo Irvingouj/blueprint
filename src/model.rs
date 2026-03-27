@@ -28,6 +28,8 @@ pub enum TypedReference {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Frontmatter {
     #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
     pub references: Vec<Reference>,
     pub base_dir: Option<String>,
     pub saved_at: Option<DateTime<Utc>>,

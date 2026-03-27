@@ -81,6 +81,7 @@ mod tests {
     #[test]
     fn round_trip() {
         let fm = Frontmatter {
+            description: Some("Test description".to_string()),
             references: vec![],
             base_dir: Some("D:\\test".to_string()),
             saved_at: None,
@@ -89,6 +90,7 @@ mod tests {
         let (yaml, body) = split(&composed);
         assert!(yaml.is_some());
         let parsed = parse(yaml.unwrap()).unwrap();
+        assert_eq!(parsed.description, Some("Test description".to_string()));
         assert_eq!(parsed.base_dir, Some("D:\\test".to_string()));
         assert_eq!(body, "# Body\n");
     }

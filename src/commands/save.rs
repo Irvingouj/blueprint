@@ -7,6 +7,7 @@ use crate::{frontmatter, storage, validator};
 
 pub async fn run(
     handle: &str,
+    description: Option<&str>,
     file: Option<&str>,
     content: Option<&str>,
     global: bool,
@@ -32,6 +33,7 @@ pub async fn run(
     let mut fm = match yaml_opt {
         Some(yaml) => frontmatter::parse(yaml)?,
         None => Frontmatter {
+            description: None,
             references: Vec::new(),
             base_dir: None,
             saved_at: None,
@@ -43,20 +45,93 @@ pub async fn run(
     fm.base_dir = Some(cwd.display().to_string());
     fm.saved_at = Some(Utc::now());
 
-    // 4. Validate
+    // 4. Set description: CLI arg takes priority, then existing frontmatter, then auto-extract from H1
+    fm.description = description
+        .map(|s| s.to_string())
+        .or(fm.description)
+        .or_else(|| extract_h1(body));
+
+    // 5. Validate
     let warnings = validator::validate_frontmatter(&fm)?;
     for w in &warnings {
         eprintln!("Warning: {}", w.message);
     }
 
-    // 5. Recompose
+    // 6. Recompose
     let document = frontmatter::compose(&fm, body)?;
 
-    // 6. Write
+    // 7. Write
     let dir = storage::storage_dir(global)?;
     storage::write_blueprint(&dir, handle, &document).await?;
 
     let path = dir.join(format!("{handle}.md"));
     println!("Saved blueprint '{handle}' to {}", path.display());
     Ok(())
+}
+
+/// Extract the first H1 heading from markdown body
+fn extract_h1(body: &str) -> Option<String> {
+    for line in body.lines() {
+        let trimmed = line.trim();
+        if let Some(content) = trimmed.strip_prefix("# ") {
+            let desc = content.trim();
+            if !desc.is_empty() {
+                return Some(desc.to_string());
+            }
+        }
+    }
+    None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn extract_h1_simple() {
+        let body = "# Hello World\nSome content";
+        assert_eq!(extract_h1(body), Some("Hello World".to_string()));
+    }
+
+    #[test]
+    fn extract_h1_with_whitespace() {
+        let body = "  #   Hello World  \nSome content";
+        assert_eq!(extract_h1(body), Some("Hello World".to_string()));
+    }
+
+    #[test]
+    fn extract_h1_empty_body() {
+        let body = "";
+        assert_eq!(extract_h1(body), None);
+    }
+
+    #[test]
+    fn extract_h1_no_h1() {
+        let body = "## Section\nSome content";
+        assert_eq!(extract_h1(body), None);
+    }
+
+    #[test]
+    fn extract_h1_empty_h1() {
+        let body = "# \nSome content";
+        assert_eq!(extract_h1(body), None);
+    }
+
+    #[test]
+    fn extract_h1_with_hash_in_content() {
+        let body = "# Fix #123: login bug\nSome content";
+        assert_eq!(extract_h1(body), Some("Fix #123: login bug".to_string()));
+    }
+
+    #[test]
+    fn extract_h1_multiline() {
+        let body = "Some intro\n# The Real Title\nContent here";
+        assert_eq!(extract_h1(body), Some("The Real Title".to_string()));
+    }
+
+    #[test]
+    fn extract_h1_not_h2() {
+        let body = "## Not this\n# But this\nContent";
+        assert_eq!(extract_h1(body), Some("But this".to_string()));
+    }
 }

@@ -24,13 +24,27 @@ async fn main() {
     let result = match cli.command {
         Command::Save {
             handle,
+            description,
             file,
             content,
             global,
-        } => commands::save::run(&handle, file.as_deref(), content.as_deref(), global).await,
+        } => {
+            commands::save::run(
+                &handle,
+                description.as_deref(),
+                file.as_deref(),
+                content.as_deref(),
+                global,
+            )
+            .await
+        }
         Command::Load { handle, global } => commands::load::run(&handle, global).await,
         Command::Skill => commands::skill::run(),
-        Command::List { global } => commands::list::run(global).await,
+        Command::List {
+            global,
+            sort_time,
+            filter,
+        } => commands::list::run(global, sort_time, filter.as_deref()).await,
     };
 
     if let Err(e) = result {
