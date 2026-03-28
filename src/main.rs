@@ -38,7 +38,11 @@ async fn main() {
             )
             .await
         }
-        Command::Load { handle, global } => commands::load::run(&handle, global).await,
+        Command::Load {
+            handle,
+            global,
+            no_expand,
+        } => commands::load::run(&handle, global, no_expand).await,
         Command::Skill => commands::skill::run(),
         Command::List {
             global,

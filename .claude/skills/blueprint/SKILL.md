@@ -1,4 +1,4 @@
-pub const SKILL_TEXT: &str = r##"---
+---
 name: blueprint
 description: Use this skill whenever the user wants to save, load, list, or manage blueprints — markdown documents with embedded file/URL/git-diff references that get resolved inline on load. Enables cross-session communication by capturing implementation plans with their full source context so another agent (or yourself in a future session) can pick up exactly where you left off. Trigger when the user mentions 'blueprint', 'save a plan', 'load content into context', or asks to capture implementation plans with full source context.
 ---
@@ -96,7 +96,6 @@ Load a blueprint and resolve all references, outputting the complete context.
 ```bash
 blueprint load refactor-auth
 blueprint load global-template --global
-blueprint load refactor-auth --no-expand   # Skip reference resolution
 ```
 
 **Output Format:**
@@ -131,8 +130,6 @@ Implementation plan goes here...
 - Git-diff references: Run `git diff <range> -- <path>` with 15s timeout
 - Failed resolutions: Output `[unresolved: <error>]` instead of content
 - All resolutions happen concurrently for speed
-
-**`--no-expand`:** Skip reference resolution entirely and output only the markdown body. Useful when you want to read the plan without inlining all referenced files (e.g., for quick review or editing).
 
 **Language detection:** Code blocks use file extension for syntax highlighting:
 - `.rs` → `rust`, `.ts` → `typescript`, `.py` → `python`, `.go` → `go`, etc.
@@ -237,9 +234,8 @@ blueprint save --handle <name> --file <path> [--global] [--description "text"]
 blueprint save --handle <name> "# Markdown content"
 
 # Load with all references resolved
-blueprint load <name> [--global] [--no-expand]
+blueprint load <name> [--global]
 
 # List available (with optional sorting and filtering)
 blueprint list [--global] [--sort-time] [--filter <pattern>]
 ```
-"##;

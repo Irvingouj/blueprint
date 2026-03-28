@@ -63,6 +63,10 @@ pub enum Command {
         /// Load from global storage
         #[arg(long)]
         global: bool,
+
+        /// Output only the markdown body without resolving references
+        #[arg(long)]
+        no_expand: bool,
     },
 
     /// Output a SKILL.md for AI agent system prompts

@@ -6,7 +6,7 @@ use crate::error::Result;
 use crate::model::ResolveContext;
 use crate::{frontmatter, resolver, storage};
 
-pub async fn run(handle: &str, global: bool) -> Result<()> {
+pub async fn run(handle: &str, global: bool, no_expand: bool) -> Result<()> {
     let dir = storage::storage_dir(global)?;
     let raw = storage::read_blueprint(&dir, handle).await?;
 
@@ -36,8 +36,8 @@ pub async fn run(handle: &str, global: bool) -> Result<()> {
     // Print the plan body
     print!("{body}");
 
-    // If there are references, resolve and append
-    if !fm.references.is_empty() {
+    // If there are references, resolve and append (unless --no-expand)
+    if !no_expand && !fm.references.is_empty() {
         let ctx = ResolveContext {
             base_dir,
             timeout_override: None,
